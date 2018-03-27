@@ -27,6 +27,7 @@
 #import "APPNotificationCategory.h"
 #import "UNUserNotificationCenter+APPLocalNotification.h"
 #import "UNNotificationRequest+APPLocalNotification.h"
+#import "FirebasePlugin.h"
 
 @interface APPLocalNotification ()
 
@@ -485,8 +486,14 @@ UNNotificationPresentationOptions const OptionAlert = UNNotificationPresentation
               willPresentNotification:notification
                 withCompletionHandler:handler];
 
-    if ([toast.trigger isKindOfClass:UNPushNotificationTrigger.class])
+    if ([toast.trigger isKindOfClass:UNPushNotificationTrigger.class]) {
+        NSDictionary *mutableUserInfo = [notification.request.content.userInfo mutableCopy];
+        [mutableUserInfo setValue:nil forKey:@"tap"];
+        // Pring full message.
+        NSLog(@"%@", mutableUserInfo);
+        [FirebasePlugin.firebasePlugin sendNotification:mutableUserInfo];
         return;
+    }
 
     APPNotificationOptions* options = toast.options;
 
